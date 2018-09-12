@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form(name="apiquery", method="post")
+    div.input
+      input(type="radio", name="Search", value="1", checked=true)
+      span.label Search: 
+      input(type="text", name="SearchString", value="Co")
+    div.input
+      input(type="radio", name="Province", value="2")
+      span.label Province: 
+      option(name="ProvinceOpt", value="BC")
+    div.actions
+      br
+      input(type="submit", value="Submit")
