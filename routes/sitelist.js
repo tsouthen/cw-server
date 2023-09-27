@@ -9,7 +9,7 @@ var path = require('path');
 var geolib = require('geolib');
 
 var fileName = path.join(path.resolve(path.join(__dirname, '/../data')), 'sitelist.json');
-var url = "http://dd.weatheroffice.ec.gc.ca/citypage_weather/xml/siteList.xml";
+var url = "https://dd.weather.gc.ca/citypage_weather/xml/siteList.xml";
 
 getLastModified = function(uri, callback) {
   request.head({uri:uri}, function(error, response, body) {
@@ -92,7 +92,7 @@ formulateResults = function(siteListJson) {
 
 loadCoordinates = function(results, callback) {
   csv({ noheader: true })
-  .fromStream(request.get('http://dd.weatheroffice.ec.gc.ca/citypage_weather/docs/site_list_en.csv'))
+  .fromStream(request.get('https://dd.weather.gc.ca/citypage_weather/docs/site_list_en.csv'))
   .on('csv', (csvRow)=> {
     var code = csvRow[0];
     if (csvRow[3] && csvRow[4] && results.sites[code]) {
@@ -114,7 +114,7 @@ loadCoordinates = function(results, callback) {
   })
   .on('error', (err)=> {
     callback(err, null);
-  });                      
+  });
 }
 
 loadCachedData = function(uri, fileName, callback) {
@@ -133,8 +133,8 @@ loadCachedData = function(uri, fileName, callback) {
         return;
       }
       callback(null, results, false);
-      //fs.writeFileSync(fileName, JSON.stringify(results, null, 4), { encoding : 'latin1'});  
-    }); 
+      //fs.writeFileSync(fileName, JSON.stringify(results, null, 4), { encoding : 'latin1'});
+    });
   });
 }
 
@@ -146,14 +146,14 @@ loadData = function(callback) {
     }
     if (!cached) {
       var results = formulateResults(results);
-    
+
       //load lat/lon from csv file
       loadCoordinates(results, function(error, results) {
         if (error) {
           callback("Error loading coordinates: " + error);
           return;
         }
-        fs.writeFileSync(fileName, JSON.stringify(results, null, 4), { encoding : 'latin1'});  
+        fs.writeFileSync(fileName, JSON.stringify(results, null, 4), { encoding : 'latin1'});
       });
     }
     callback(null, results);
@@ -171,7 +171,7 @@ getSites = function(siteList, matches) {
       code = value;
     }
     var site = siteList.sites[code];
-    sites.push({ code: code, name: site.name, nameFr: site.nameFr, province: site.province} ); 
+    sites.push({ code: code, name: site.name, nameFr: site.nameFr, province: site.province} );
   });
   return sites;
 }

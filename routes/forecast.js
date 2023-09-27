@@ -36,12 +36,15 @@ router.get('/', function(req, res, next) {
       }
       site = sites[0];
     }
-    var url = "http://dd.weatheroffice.ec.gc.ca/citypage_weather/xml/" + site.province + "/" + site.code + "_" + lang + ".xml";
+    var url = "https://dd.weather.gc.ca/citypage_weather/xml/" + site.province + "/" + site.code + "_" + lang + ".xml";
     //TODO: get last mod date of URL and use local cache if it's newer
-
-    request({uri:url, encoding: 'latin1'}, function(error, response, body) {
+    console.log(`Requesting url: ${url}`);
+    request({uri: url, encoding: 'latin1'}, function(error, response, body) {
       if (error) {
         res.send("Error loading citypage weather. Url: " + url + " Error: " + error);
+        return;
+      } else if (response.statusCode !== 200) {
+        res.send(`Error code returned: ${response.statusCode}, message: ${response.statusMessage}`);
         return;
       }
       var json = parseString(body, {mergeAttrs: true, explicitArray: false}, function(err, result) {
@@ -52,7 +55,7 @@ router.get('/', function(req, res, next) {
         if (result.siteData) {
           if (result.siteData.forecastGroup) {
             var fg = result.siteData.forecastGroup;
-            
+
             //get the timeStamp in UTC and put it in the first forecast item
             for (var idx = 0; idx < fg.dateTime.length; idx++) {
               if (fg.dateTime[idx].zone === "UTC") {
